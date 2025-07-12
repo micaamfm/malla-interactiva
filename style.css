@@ -1,0 +1,31 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f7f7f7;
+  padding: 2rem;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+#malla {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.materia {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.materia:hover {
+  background: #e0f7fa;
+}
