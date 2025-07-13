@@ -15,7 +15,14 @@ const materias = [
   { nombre: "Economía de América Latina", año: 3, semestre: 5, prerequisito: "Macroeconomía I" },
   { nombre: "Estadística II", año: 3, semestre: 5, prerequisito: "Estadística I" },
   { nombre: "Macroeconomía III", año: 3, semestre: 5, prerequisito: "Macroeconomía II" },
-  { nombre: "Introducción a la Metodología", año: 3, semestre: 5 }
+  { nombre: "Introducción a la Metodología", año: 3, semestre: 5 },
+  { nombre: "Economía del Uruguay", año: 3, semestre: 6, prerequisito: "Microeconomía I y Macroeconomía II" },
+  { nombre: "Microeconomía III", año: 3, semestre: 6, prerequisito: "Microeconomía II" },
+  { nombre: "Econometría I", año: 3, semestre: 6, prerequisito: "Estadística II" },
+  { nombre: "Economía Internacional", año: 4, semestre: 7, prerequisito: "Macroeconomía II y Microeconomía I" },
+  { nombre: "Teorías del Desarrollo Económico", año: 4, semestre: 7, prerequisito: "Macroeconomía III" },
+  { nombre: "Econometría II", año: 4, semestre: 7, prerequisito: "Econometría I" },
+  { nombre: "Historia del Pensamiento Económico", año: 4, semestre: 7 }
 ];
 
 const malla = document.getElementById("malla");
