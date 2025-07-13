@@ -1,4 +1,4 @@
-const materias = [
+const materiasObligatorias = [
   { nombre: "Administración y Gestión de las Organizaciones I", año: 1, semestre: 1 },
   { nombre: "Introducción a la Microeconomía", año: 1, semestre: 1 },
   { nombre: "Cálculo I", año: 1, semestre: 1 },
@@ -25,6 +25,19 @@ const materias = [
   { nombre: "Historia del Pensamiento Económico", año: 4, semestre: 7, nota: "➜ Se necesitan 180 créditos" }
 ];
 
+const optativasImpar = [
+  { nombre: "Economía Pública", tipo: "Optativa Impar", prerequisito: "Microeconomía II" },
+  { nombre: "Economía y Género", tipo: "Optativa Impar", prerequisito: "Microeconomía I y Estadística I" }
+];
+
+const optativasPar = [
+  { nombre: "Ciencia Política", tipo: "Optativa Par" },
+  { nombre: "Cálculo III", tipo: "Optativa Par", prerequisito: "Cálculo II" },
+  { nombre: "Matemática Financiera", tipo: "Optativa Par", prerequisito: "Estadística I" },
+  { nombre: "Economía Laboral", tipo: "Optativa Par", prerequisito: "Microeconomía I" },
+  { nombre: "Desigualdad y Pobreza", tipo: "Optativa Par", prerequisito: "Estadística I" }
+];
+
 let aprobadas = new Set();
 
 const malla = document.getElementById("malla");
@@ -35,57 +48,72 @@ function puedeCursar(materia) {
   return prereqs.every(p => aprobadas.has(p));
 }
 
+function renderGrupo(materias, tituloSeccion) {
+  const contenedor = document.createElement("div");
+  contenedor.className = "semestre";
+
+  const titulo = document.createElement("h2");
+  titulo.innerText = tituloSeccion;
+  contenedor.appendChild(titulo);
+
+  materias.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "materia";
+
+    if (aprobadas.has(m.nombre)) {
+      div.classList.add("aprobada");
+    } else if (puedeCursar(m)) {
+      div.classList.add("disponible");
+    } else {
+      div.classList.add("bloqueada");
+    }
+
+    div.innerHTML = `<strong>${m.nombre}</strong><br>` +
+                    (m.año ? `<span>Año ${m.año}</span>` : "") +
+                    (m.nota ? `<div class="nota">${m.nota}</div>` : "");
+
+    div.onclick = () => {
+      if (aprobadas.has(m.nombre)) {
+        aprobadas.delete(m.nombre);
+      } else {
+        aprobadas.add(m.nombre);
+      }
+      renderizarMalla();
+    }
+
+    contenedor.appendChild(div);
+  });
+
+  malla.appendChild(contenedor);
+}
+
 function renderizarMalla() {
   malla.innerHTML = "";
 
+  // Obligatorias por semestre
   const semestres = {};
-  materias.forEach(m => {
+  materiasObligatorias.forEach(m => {
     if (!semestres[m.semestre]) semestres[m.semestre] = [];
     semestres[m.semestre].push(m);
   });
 
   Object.keys(semestres).sort((a, b) => a - b).forEach(sem => {
-    const contSem = document.createElement("div");
-    contSem.className = "semestre";
-
-    const titulo = document.createElement("h2");
-    titulo.innerText = `Semestre ${sem}`;
-    contSem.appendChild(titulo);
-
-    semestres[sem].forEach(m => {
-      const div = document.createElement("div");
-      div.className = "materia";
-
-      if (aprobadas.has(m.nombre)) {
-        div.classList.add("aprobada");
-      } else if (puedeCursar(m)) {
-        div.classList.add("disponible");
-      } else {
-        div.classList.add("bloqueada");
-      }
-
-      div.innerHTML = `<strong>${m.nombre}</strong><br><span>Año ${m.año}</span>` +
-                      (m.nota ? `<div class="nota">${m.nota}</div>` : "");
-
-      div.onclick = () => {
-        if (aprobadas.has(m.nombre)) {
-          aprobadas.delete(m.nombre);
-        } else {
-          aprobadas.add(m.nombre);
-        }
-        renderizarMalla();
-      }
-
-      contSem.appendChild(div);
-    });
-
-    malla.appendChild(contSem);
+    renderGrupo(semestres[sem], `Semestre ${sem}`);
   });
 
-  // Mostrar resumen de avance
-  const total = materias.length;
-  const aprobadasCount = aprobadas.size;
-  const disponiblesCount = materias.filter(m => !aprobadas.has(m.nombre) && puedeCursar(m)).length;
+  // Secciones de optativas
+  renderGrupo(optativasImpar, "Optativas Semestre Impar");
+  renderGrupo(optativasPar, "Optativas Semestre Par");
+
+  // Avance
+  const todas = [...materiasObligatorias, ...optativasImpar, ...optativasPar];
+  const total = todas.length;
+  const aprobadasCount = Array.from(aprobadas).filter(nombre =>
+    todas.some(m => m.nombre === nombre)
+  ).length;
+  const disponiblesCount = todas.filter(m =>
+    !aprobadas.has(m.nombre) && puedeCursar(m)
+  ).length;
 
   const resumen = document.getElementById("resumen-avance");
   if (resumen) {
@@ -94,3 +122,4 @@ function renderizarMalla() {
 }
 
 renderizarMalla();
+  
