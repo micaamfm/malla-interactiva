@@ -25,11 +25,60 @@ const materias = [
   { nombre: "Historia del Pensamiento Económico", año: 4, semestre: 7 }
 ];
 
+let aprobadas = new Set();
+
 const malla = document.getElementById("malla");
 
-materias.forEach(m => {
-  const div = document.createElement("div");
-  div.className = "materia";
-  div.innerHTML = `<strong>${m.nombre}</strong><br><span>Año ${m.año} - Semestre ${m.semestre}</span>`;
-  malla.appendChild(div);
-});
+function puedeCursar(materia) {
+  if (!materia.prerequisito) return true;
+  const prereqs = materia.prerequisito.split(" y ").map(p => p.trim());
+  return prereqs.every(p => aprobadas.has(p));
+}
+
+function renderizarMalla() {
+  malla.innerHTML = "";
+
+  const semestres = {};
+  materias.forEach(m => {
+    if (!semestres[m.semestre]) semestres[m.semestre] = [];
+    semestres[m.semestre].push(m);
+  });
+
+  Object.keys(semestres).sort((a,b) => a-b).forEach(sem => {
+    const contSem = document.createElement("div");
+    contSem.className = "semestre";
+
+    const titulo = document.createElement("h2");
+    titulo.innerText = `Semestre ${sem}`;
+    contSem.appendChild(titulo);
+
+    semestres[sem].forEach(m => {
+      const div = document.createElement("div");
+      div.className = "materia";
+
+      if (aprobadas.has(m.nombre)) {
+        div.classList.add("aprobada");
+      } else if (puedeCursar(m)) {
+        div.classList.add("disponible");
+      } else {
+        div.classList.add("bloqueada");
+      }
+
+      div.innerHTML = `<strong>${m.nombre}</strong><br><span>Año ${m.año}</span>`;
+      div.onclick = () => {
+        if (aprobadas.has(m.nombre)) {
+          aprobadas.delete(m.nombre);
+        } else {
+          aprobadas.add(m.nombre);
+        }
+        renderizarMalla();
+      }
+
+      contSem.appendChild(div);
+    });
+
+    malla.appendChild(contSem);
+  });
+}
+
+renderizarMalla();
