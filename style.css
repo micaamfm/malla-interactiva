@@ -55,3 +55,10 @@ h1 {
   opacity: 0.6;
   cursor: not-allowed;
 }
+.nota {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #616161;
+  font-style: italic;
+}
+
